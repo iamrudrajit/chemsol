@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chemical Solution Preparation Calculator</title>
+  <style>
+    :root {
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --border-focus: #3b82f6;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --success-bg: #f0fdf4;
+      --success-border: #86efac;
+      --success-text: #14532d;
+      --warning-bg: #fffbeb;
+      --warning-border: #fef08a;
+      --warning-text: #92400e;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --danger-text: #b91c1c;
+      --radius: 12px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 36px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--card-bg);
+      padding: 24px 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-text p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-reset:hover {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #fca5a5;
+    }
+
+    /* Grid Layout */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .card:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header h2 {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .badge-auto {
+      font-size: 0.75rem;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    input:disabled, select:disabled {
+      background-color: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+      border-color: #e2e8f0;
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* Result Card */
+    .hero-result {
+      background: var(--success-bg);
+      border: 2px solid var(--success-border);
+      border-radius: var(--radius);
+      padding: 26px 20px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .hero-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--success-text);
+      margin-bottom: 6px;
+    }
+
+    .hero-val {
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: var(--success-text);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .hero-instruction {
+      font-size: 0.95rem;
+      color: #166534;
+      font-weight: 500;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      line-height: 1.5;
+    }
+
+    .alert-danger {
+      background-color: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: var(--danger-text);
+    }
+
+    .alert-warning {
+      background-color: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning-text);
+    }
+
+    /* SOP steps */
+    .sop-section {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 24px;
+    }
+
+    .sop-section h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #0f172a;
+    }
+
+    .sop-list {
+      list-style-type: none;
+      counter-reset: step-seq;
+    }
+
+    .sop-list li {
+      counter-increment: step-seq;
+      position: relative;
+      padding-left: 36px;
+      margin-bottom: 14px;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+
+    .sop-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .sop-list li::before {
+      content: counter(step-seq);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      background: var(--primary);
+      color: #ffffff;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Breakdown Box */
+    .breakdown-terminal {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-text">
+      <h1>⚗️ Chemical Solution Preparation Calculator</h1>
+      <p>Analytical preparation tool with automatic factor population and dilution calculations</p>
+    </div>
+    <div>
+      <button class="btn-reset" id="resetBtn" type="button">🔄 Reset All (Blank / Custom)</button>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- LEFT PANEL: INPUT CONTROLS -->
+    <div>
+      <!-- Card 1: Chemical Selection & Physical Constants -->
+      <div class="card">
+        <div class="card-header">
+          <h2>1. Reagent &amp; Properties</h2>
+          <span class="badge-auto" id="autoBadge">Custom Mode</span>
+        </div>
+
+        <div class="form-group">
+          <label for="chemSelect">Select Chemical</label>
+          <select id="chemSelect"></select>
+          <div class="field-hint">Select a reagent to auto-fill properties, or choose '+ Custom Chemical' for manual entry.</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="chemName">Chemical Name / Formula</label>
+            <input type="text" id="chemName" value="" placeholder="e.g. Sulfuric Acid (H2SO4)">
+          </div>
+          <div class="form-group">
+            <label for="chemState">Physical State</label>
+            <select id="chemState">
+              <option value="solid" selected>Solid (Powder / Pellets / Crystals)</option>
+              <option value="liquid">Liquid (Stock Solution / Acid)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="chemMW">Molar Mass (g/mol)</label>
+            <input type="number" step="0.001" id="chemMW" value="" placeholder="e.g. 98.079">
+          </div>
+          <div class="form-group">
+            <label for="chemNFactor">n-factor (Valency / Basicity / e⁻)</label>
+            <input type="number" step="0.1" min="0.1" id="chemNFactor" value="" placeholder="e.g. 1 or 2">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="chemEqW">Equivalent Weight (g/eq)</label>
+          <input type="number" step="0.001" id="chemEqW" value="" placeholder="e.g. 49.0395">
+          <div class="field-hint" id="eqWHint">Auto-calculated when MW and n-factor are entered. Fully editable.</div>
+        </div>
+      </div>
+
+      <!-- Card 2: Stock Reagent Properties -->
+      <div class="card">
+        <div class="card-header">
+          <h2>2. Available Stock Reagent</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="stockPurity" id="purityLabel">Chemical Purity / Assay (% w/w)</label>
+          <input type="number" step="0.01" min="0.1" max="100" id="stockPurity" value="" placeholder="e.g. 99">
+          <div class="field-hint" id="purityHint">For solid reagents, enter the assay/purity % (e.g. 98% or 85%). Mass required is adjusted automatically.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="stockDensity">Stock Density (g/mL)</label>
+          <input type="number" step="0.001" min="0.1" id="stockDensity" value="" disabled placeholder="Disabled for solid reagents">
+          <div class="field-hint" id="densityHint">Required for liquid reagents to calculate volume. Automatically disabled for solids.</div>
+        </div>
+      </div>
+
+      <!-- Card 3: Target Solution Requirement -->
+      <div class="card">
+        <div class="card-header">
+          <h2>3. Target Solution Requirement</h2>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="targetConcVal">Desired Concentration</label>
+            <input type="number" step="0.001" min="0.0001" id="targetConcVal" value="" placeholder="e.g. 0.5">
+          </div>
+          <div class="form-group">
+            <label for="targetConcUnit">Concentration Unit</label>
+            <select id="targetConcUnit">
+              <option value="N">Normality (N = eq/L)</option>
+              <option value="M">Molarity (M = mol/L)</option>
+              <option value="wv">% w/v (g / 100 mL)</option>
+              <option value="ww">% w/w (g solute / 100 g solution)</option>
+              <option value="vv">% v/v (mL solute / 100 mL solution)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Conditional row for % w/w target solution density -->
+        <div class="form-group" id="targetDensityGroup" style="display: none;">
+          <label for="targetSolnDensity">Target Solution Density (g/mL)</label>
+          <input type="number" step="0.001" min="0.1" id="targetSolnDensity" value="1.0" placeholder="Default: 1.0 g/mL (aqueous)">
+          <div class="field-hint">Used to convert target volume (mL) to target solution mass (g) for % w/w calculation. Defaults to ~1.0 g/mL for dilute aqueous solutions.</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="targetVolVal">Desired Final Volume</label>
+            <input type="number" step="0.1" min="0.1" id="targetVolVal" value="" placeholder="e.g. 200">
+          </div>
+          <div class="form-group">
+            <label for="targetVolUnit">Volume Unit</label>
+            <select id="targetVolUnit">
+              <option value="mL">Milliliters (mL)</option>
+              <option value="L">Liters (L)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: CALCULATION RESULTS -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <h2>Preparation Output</h2>
+        </div>
+
+        <div class="hero-result">
+          <div class="hero-tag" id="heroBadge">REQUIRED AMOUNT</div>
+          <div class="hero-val" id="heroResult">--</div>
+          <div class="hero-instruction" id="heroAction">Enter parameters or choose a chemical to begin</div>
+        </div>
+
+        <div id="errorAlert" class="alert alert-danger" style="display: none;"></div>
+
+        <div id="safetyAlert" class="alert alert-warning" style="display: none;">
+          <div>
+            <strong>⚠️ Laboratory Safety Warning:</strong> Concentrated acid dilution is strongly exothermic! Always add acid slowly down the wall into water. <em>Never pour water into concentrated acid.</em>
+          </div>
+        </div>
+
+        <div class="sop-section">
+          <h3>📋 Preparation Instructions</h3>
+          <ol class="sop-list" id="sopList">
+            <li>Select a chemical preset or enter custom properties to generate step-by-step preparation instructions.</li>
+          </ol>
+        </div>
+
+        <div class="card-header" style="margin-top: 24px;">
+          <h2>📐 Calculation Breakdown</h2>
+        </div>
+        <div class="breakdown-terminal" id="breakdownDisplay">Awaiting input parameters...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Complete Chemical Database with H2SO4 defaults (99% w/w, 1.84 g/mL)
+  const CHEMICAL_DATABASE = [
+    {
+      id: "custom",
+      name: "+ Custom Chemical",
+      state: "solid",
+      mw: null,
+      n: null,
+      defaultPurity: null,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "H2SO4",
+      name: "Sulfuric Acid (H2SO4)",
+      state: "liquid",
+      mw: 98.079,
+      n: 2,
+      defaultPurity: 99,
+      defaultDensity: 1.84,
+      isAcid: true
+    },
+    {
+      id: "HCl",
+      name: "Hydrochloric Acid (HCl)",
+      state: "liquid",
+      mw: 36.461,
+      n: 1,
+      defaultPurity: 37,
+      defaultDensity: 1.189,
+      isAcid: true
+    },
+    {
+      id: "HNO3",
+      name: "Nitric Acid (HNO3)",
+      state: "liquid",
+      mw: 63.012,
+      n: 1,
+      defaultPurity: 68,
+      defaultDensity: 1.413,
+      isAcid: true
+    },
+    {
+      id: "CH3COOH",
+      name: "Acetic Acid (CH3COOH)",
+      state: "liquid",
+      mw: 60.052,
+      n: 1,
+      defaultPurity: 99.8,
+      defaultDensity: 1.049,
+      isAcid: true
+    },
+    {
+      id: "NaOH",
+      name: "Sodium Hydroxide (NaOH)",
+      state: "solid",
+      mw: 39.997,
+      n: 1,
+      defaultPurity: 98,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "KOH",
+      name: "Potassium Hydroxide (KOH)",
+      state: "solid",
+      mw: 56.106,
+      n: 1,
+      defaultPurity: 85,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "NaCl",
+      name: "Sodium Chloride (NaCl)",
+      state: "solid",
+      mw: 58.443,
+      n: 1,
+      defaultPurity: 99.5,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "Na2CO3",
+      name: "Sodium Carbonate (Na2CO3)",
+      state: "solid",
+      mw: 105.988,
+      n: 2,
+      defaultPurity: 99.5,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "NaHCO3",
+      name: "Sodium Bicarbonate (NaHCO3)",
+      state: "solid",
+      mw: 84.007,
+      n: 1,
+      defaultPurity: 99.7,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "KMnO4",
+      name: "Potassium Permanganate (KMnO4)",
+      state: "solid",
+      mw: 158.034,
+      n: 5,
+      defaultPurity: 99.0,
+      defaultDensity: null,
+      isAcid: false
+    },
+    {
+      id: "OxalicAcid",
+      name: "Oxalic Acid (C2H2O4·2H2O)",
+      state: "solid",
+      mw: 126.065,
+      n: 2,
+      defaultPurity: 99.5,
+      defaultDensity: null,
+      isAcid: false
+    }
+  ];
+
+  // DOM Elements
+  const chemSelect = document.getElementById("chemSelect");
+  const chemName = document.getElementById("chemName");
+  const chemState = document.getElementById("chemState");
+  const chemMW = document.getElementById("chemMW");
+  const chemNFactor = document.getElementById("chemNFactor");
+  const chemEqW = document.getElementById("chemEqW");
+  const eqWHint = document.getElementById("eqWHint");
+  const autoBadge = document.getElementById("autoBadge");
+
+  const stockPurity = document.getElementById("stockPurity");
+  const purityLabel = document.getElementById("purityLabel");
+  const purityHint = document.getElementById("purityHint");
+  const stockDensity = document.getElementById("stockDensity");
+  const densityHint = document.getElementById("densityHint");
+
+  const targetConcVal = document.getElementById("targetConcVal");
+  const targetConcUnit = document.getElementById("targetConcUnit");
+  const targetDensityGroup = document.getElementById("targetDensityGroup");
+  const targetSolnDensity = document.getElementById("targetSolnDensity");
+  const targetVolVal = document.getElementById("targetVolVal");
+  const targetVolUnit = document.getElementById("targetVolUnit");
+
+  const heroBadge = document.getElementById("heroBadge");
+  const heroResult = document.getElementById("heroResult");
+  const heroAction = document.getElementById("heroAction");
+
+  const errorAlert = document.getElementById("errorAlert");
+  const safetyAlert = document.getElementById("safetyAlert");
+  const sopList = document.getElementById("sopList");
+  const breakdownDisplay = document.getElementById("breakdownDisplay");
+  const resetBtn = document.getElementById("resetBtn");
+
+  let isManualEqW = false;
+
+  // Populate Dropdown
+  function populateDropdown() {
+    chemSelect.innerHTML = "";
+    CHEMICAL_DATABASE.forEach(item => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.textContent = item.name;
+      chemSelect.appendChild(opt);
+    });
+  }
+
+  // Apply Chemical Preset
+  function applyPreset(id) {
+    const item = CHEMICAL_DATABASE.find(c => c.id === id);
+    if (!item) return;
+
+    if (id !== "custom") {
+      autoBadge.textContent = "Auto-filled";
+      autoBadge.style.display = "inline-block";
+      chemName.value = item.name;
+      chemState.value = item.state;
+      chemMW.value = item.mw;
+      chemNFactor.value = item.n;
+      chemEqW.value = (item.mw / item.n).toFixed(4);
+      isManualEqW = false;
+      eqWHint.textContent = "Auto-calculated: MW ÷ n-factor. Fully editable.";
+
+      stockPurity.value = item.defaultPurity;
+      stockDensity.value = item.defaultDensity !== null ? item.defaultDensity : "";
+      updateStateUI();
+      calculate();
+    } else {
+      setCustomBlank();
+    }
+  }
+
+  // Clear all inputs completely into a blank Custom Chemical state
+  function setCustomBlank() {
+    chemSelect.value = "custom";
+    autoBadge.textContent = "Custom Mode";
+    autoBadge.style.display = "inline-block";
+
+    chemName.value = "";
+    chemState.value = "solid";
+    chemMW.value = "";
+    chemNFactor.value = "";
+    chemEqW.value = "";
+    isManualEqW = false;
+    eqWHint.textContent = "Auto-calculated when MW and n-factor are entered. Fully editable.";
+
+    stockPurity.value = "";
+    stockDensity.value = "";
+
+    targetConcVal.value = "";
+    targetVolVal.value = "";
+    targetSolnDensity.value = "1.0";
+
+    updateStateUI();
+    updateTargetUnitUI();
+
+    // Reset results display to blank state
+    errorAlert.style.display = "none";
+    safetyAlert.style.display = "none";
+    heroBadge.textContent = "REQUIRED AMOUNT";
+    heroResult.textContent = "--";
+    heroAction.textContent = "Enter parameters or choose a chemical to begin";
+    sopList.innerHTML = "<li>Select a chemical preset or enter custom properties to generate step-by-step preparation instructions.</li>";
+    breakdownDisplay.textContent = "Awaiting input parameters...";
+  }
+
+  // Handle Physical State toggles
+  function updateStateUI() {
+    const isSolid = chemState.value === "solid";
+    if (isSolid) {
+      stockDensity.disabled = true;
+      stockDensity.value = "";
+      stockDensity.placeholder = "Disabled for solid reagents";
+      densityHint.textContent = "Density is disabled because solid chemicals are directly weighed on an analytical balance.";
+      purityLabel.textContent = "Chemical Purity / Assay (% w/w)";
+      purityHint.textContent = "Enter reagent purity (e.g., 85% or 98%). The required solid mass is adjusted accordingly.";
+    } else {
+      stockDensity.disabled = false;
+      stockDensity.placeholder = "e.g. 1.84";
+      densityHint.textContent = "Required for liquid reagents to convert mass into volume (mL).";
+      purityLabel.textContent = "Stock Concentration (% w/w)";
+      purityHint.textContent = "Mass percentage of pure solute in the stock solution.";
+    }
+  }
+
+  function updateTargetUnitUI() {
+    const tUnit = targetConcUnit.value;
+    if (tUnit === "ww") {
+      targetDensityGroup.style.display = "block";
+    } else {
+      targetDensityGroup.style.display = "none";
+    }
+  }
+
+  // Event Listeners
+  chemSelect.addEventListener("change", (e) => applyPreset(e.target.value));
+
+  chemMW.addEventListener("input", () => {
+    if (!isManualEqW) {
+      const mw = parseFloat(chemMW.value);
+      const n = parseFloat(chemNFactor.value);
+      if (!isNaN(mw) && !isNaN(n) && n > 0) {
+        chemEqW.value = (mw / n).toFixed(4);
+      }
+    }
+    calculate();
+  });
+
+  chemNFactor.addEventListener("input", () => {
+    if (!isManualEqW) {
+      const mw = parseFloat(chemMW.value);
+      const n = parseFloat(chemNFactor.value);
+      if (!isNaN(mw) && !isNaN(n) && n > 0) {
+        chemEqW.value = (mw / n).toFixed(4);
+      }
+    }
+    calculate();
+  });
+
+  chemEqW.addEventListener("input", () => {
+    isManualEqW = true;
+    eqWHint.textContent = "Manual Equivalent Weight entry mode.";
+    calculate();
+  });
+
+  chemState.addEventListener("change", () => {
+    updateStateUI();
+    calculate();
+  });
+
+  targetConcUnit.addEventListener("change", () => {
+    updateTargetUnitUI();
+    calculate();
+  });
+
+  [stockPurity, stockDensity, targetConcVal, targetSolnDensity, targetVolVal, targetVolUnit, chemName].forEach(el => {
+    el.addEventListener("input", calculate);
+    el.addEventListener("change", calculate);
+  });
+
+  // Reset button clears everything to clean custom option
+  resetBtn.addEventListener("click", () => {
+    setCustomBlank();
+  });
+
+  function calculate() {
+    errorAlert.style.display = "none";
+    safetyAlert.style.display = "none";
+
+    const name = chemName.value.trim() || "Chemical";
+    const state = chemState.value;
+    const mw = parseFloat(chemMW.value);
+    const nFactor = parseFloat(chemNFactor.value);
+    const eqW = parseFloat(chemEqW.value);
+
+    const purity = parseFloat(stockPurity.value);
+    const density = parseFloat(stockDensity.value);
+
+    const tConc = parseFloat(targetConcVal.value);
+    const tUnit = targetConcUnit.value;
+    const tVol = parseFloat(targetVolVal.value);
+    const vUnit = targetVolUnit.value;
+    const tDensity = parseFloat(targetSolnDensity.value) || 1.0;
+
+    // Check if fields are empty (e.g. initial load or after reset)
+    if (isNaN(tConc) || isNaN(tVol) || isNaN(purity)) {
+      heroResult.textContent = "--";
+      heroAction.textContent = "Enter parameters or choose a chemical to begin";
+      sopList.innerHTML = "<li>Select a chemical preset or enter custom properties to generate step-by-step preparation instructions.</li>";
+      breakdownDisplay.textContent = "Awaiting input parameters...";
+      return;
+    }
+
+    // Input Validations
+    if (tConc <= 0) return displayError("Please enter a valid Desired Concentration (> 0).");
+    if (tVol <= 0) return displayError("Please enter a valid Desired Volume (> 0).");
+    if (purity <= 0 || purity > 100) return displayError("Please enter a valid Stock Purity % (between 0.1 and 100).");
+
+    const volInLiters = vUnit === "L" ? tVol : tVol / 1000;
+    const volInML = vUnit === "L" ? tVol * 1000 : tVol;
+
+    // Handle % v/v special case
+    if (tUnit === "vv") {
+      if (state === "solid") {
+        return displayError("% v/v concentration is intended for liquid solutes. Please choose % w/v, % w/w, Molarity, or Normality for solid reagents.");
+      }
+      if (isNaN(density) || density <= 0) {
+        return displayError("Please enter a valid stock density (g/mL) for this liquid reagent.");
+      }
+
+      const pureSoluteVolML = (tConc / 100) * volInML;
+      const requiredStockVol = pureSoluteVolML / (purity / 100);
+
+      heroBadge.textContent = "REQUIRED STOCK VOLUME TO MEASURE";
+      heroResult.textContent = `${requiredStockVol.toFixed(2)} mL`;
+      heroAction.textContent = `Measure exactly ${requiredStockVol.toFixed(2)} mL of stock ${name}`;
+
+      breakdownDisplay.textContent =
+`=== 1. TARGET REQUIREMENT ===
+Chemical: ${name} (Liquid Stock)
+Target = ${tConc}% v/v in ${volInML.toFixed(1)} mL (${volInLiters.toFixed(4)} L)
+
+=== 2. PURE SOLUTE VOLUME REQUIRED ===
+Formula: Pure Solute Liquid Volume (mL) = (% v/v ÷ 100) × Final Volume (mL)
+Calculation: (${tConc} ÷ 100) × ${volInML.toFixed(1)} mL
+Pure Solute Volume = ${pureSoluteVolML.toFixed(3)} mL
+
+=== 3. STOCK VOLUME CALCULATION ===
+Stock Reagent Purity = ${purity}%
+Formula: Stock Volume = Pure Solute Volume ÷ (Stock Purity % ÷ 100)
+Calculation: ${pureSoluteVolML.toFixed(3)} mL ÷ (${purity} ÷ 100)
+Required Stock Volume = ${requiredStockVol.toFixed(3)} mL (≈ ${requiredStockVol.toFixed(2)} mL)`;
+
+      const isAcid = /H2SO4|HCl|HNO3|Sulfuric|Hydrochloric|Nitric|Acetic|CH3COOH/i.test(name);
+      if (isAcid) safetyAlert.style.display = "flex";
+      renderSOP(name, true, requiredStockVol, "mL", volInML, isAcid);
+      return;
+    }
+
+    // Physical property validations for mass-based units
+    if (tUnit === "N" && (isNaN(eqW) || eqW <= 0)) {
+      return displayError("Please enter a valid Equivalent Weight (> 0) for Normality calculation.");
+    }
+    if (tUnit === "M" && (isNaN(mw) || mw <= 0)) {
+      return displayError("Please enter a valid Molar Mass (> 0) for Molarity calculation.");
+    }
+
+    // 1. Calculate Pure Active Solute Mass
+    let pureMass = 0;
+    let pureStepsText = "";
+
+    if (tUnit === "N") {
+      pureMass = tConc * volInLiters * eqW;
+      pureStepsText = `Formula: Pure Mass (g) = Normality (N) × Volume (L) × Equivalent Weight\n` +
+                      `Pure Mass = ${tConc} eq/L × ${volInLiters.toFixed(4)} L × ${eqW.toFixed(4)} g/eq\n` +
+                      `Pure Solute Mass = ${pureMass.toFixed(4)} g`;
+    } else if (tUnit === "M") {
+      pureMass = tConc * volInLiters * mw;
+      pureStepsText = `Formula: Pure Mass (g) = Molarity (M) × Volume (L) × Molar Mass\n` +
+                      `Pure Mass = ${tConc} mol/L × ${volInLiters.toFixed(4)} L × ${mw.toFixed(4)} g/mol\n` +
+                      `Pure Solute Mass = ${pureMass.toFixed(4)} g`;
+    } else if (tUnit === "wv") {
+      pureMass = (tConc * volInML) / 100;
+      pureStepsText = `Formula: Pure Mass (g) = (% w/v × Final Volume in mL) ÷ 100\n` +
+                      `Pure Mass = (${tConc} g / 100 mL) × ${volInML.toFixed(1)} mL\n` +
+                      `Pure Solute Mass = ${pureMass.toFixed(4)} g`;
+    } else if (tUnit === "ww") {
+      const targetSolnMass = volInML * tDensity;
+      pureMass = (tConc / 100) * targetSolnMass;
+      pureStepsText = `Target Solution Volume = ${volInML.toFixed(1)} mL | Target Density = ${tDensity.toFixed(4)} g/mL\n` +
+                      `1. Target Solution Mass = Volume (mL) × Density = ${volInML.toFixed(1)} × ${tDensity.toFixed(4)} = ${targetSolnMass.toFixed(4)} g\n` +
+                      `2. Pure Solute Mass = (% w/w ÷ 100) × Solution Mass\n` +
+                      `   = (${tConc} ÷ 100) × ${targetSolnMass.toFixed(4)} g = ${pureMass.toFixed(4)} g`;
+    }
+
+    // 2. Calculations: Solid Reagents (Purity Bug Fixed)
+    if (state === "solid") {
+      const requiredSolidMass = pureMass / (purity / 100);
+
+      heroBadge.textContent = "REQUIRED SOLID MASS TO WEIGH";
+      heroResult.textContent = `${requiredSolidMass.toFixed(4)} g`;
+      heroAction.textContent = `Weigh exactly ${requiredSolidMass.toFixed(4)} g of ${name} (${purity}% purity)`;
+
+      const mwInfo = !isNaN(mw) && mw > 0 ? `Molar Mass = ${mw.toFixed(3)} g/mol | ` : "";
+      const nInfo = !isNaN(nFactor) && nFactor > 0 ? `n-factor = ${nFactor} | ` : "";
+      const eqInfo = !isNaN(eqW) && eqW > 0 ? `Eq. Weight = ${eqW.toFixed(4)} g/eq\n` : "\n";
+
+      breakdownDisplay.textContent =
+`=== 1. TARGET REQUIREMENT ===
+Chemical: ${name} (Solid)
+${mwInfo}${nInfo}${eqInfo}Target = ${tConc} ${tUnit} in ${volInML.toFixed(1)} mL (${volInLiters.toFixed(4)} L)
+
+=== 2. PURE SOLUTE REQUIRED ===
+${pureStepsText}
+
+=== 3. SOLID PURITY / ASSAY CORRECTION ===
+Reagent Assay / Purity = ${purity}% w/w
+Formula: Required Solid Mass = Pure Mass ÷ (Purity % ÷ 100)
+Calculation: ${pureMass.toFixed(4)} g ÷ (${purity} ÷ 100)
+Required Solid Mass = ${requiredSolidMass.toFixed(4)} g`;
+
+      renderSOP(name, false, requiredSolidMass, "g", volInML, false);
+      return;
+    }
+
+    // 3. Calculations: Liquid Reagents
+    if (isNaN(density) || density <= 0) {
+      return displayError("Please enter a valid stock density (g/mL) for this liquid reagent.");
+    }
+
+    let requiredStockVol = 0;
+    let liquidStepsText = "";
+
+    if (tUnit === "N") {
+      // Normality via N1V1 = N2V2
+      const stockNormality = (purity * density * 10) / eqW;
+      requiredStockVol = (tConc * volInML) / stockNormality;
+
+      liquidStepsText =
+`=== 2. STOCK SOLUTION NORMALITY (N1) ===
+Formula: N1 = (% Purity × Density × 10) ÷ Equivalent Weight
+Calculation: (${purity} × ${density.toFixed(4)} × 10) ÷ ${eqW.toFixed(4)}
+            = ${(purity * density * 10).toFixed(4)} ÷ ${eqW.toFixed(4)}
+Stock Normality (N1) = ${stockNormality.toFixed(4)} N
+
+=== 3. DILUTION FORMULA (N1 × V1 = N2 × V2) ===
+Target Normality (N2) = ${tConc} N
+Target Final Volume (V2) = ${volInML.toFixed(1)} mL
+Formula: V1 = (N2 × V2) ÷ N1
+Calculation: (${tConc} × ${volInML.toFixed(1)}) ÷ ${stockNormality.toFixed(4)}
+Required Stock Volume (V1) = ${requiredStockVol.toFixed(3)} mL (≈ ${requiredStockVol.toFixed(2)} mL)`;
+    } else {
+      // Molarity, % w/v, and % w/w using Mass & Density
+      const stockMass = pureMass / (purity / 100);
+      requiredStockVol = stockMass / density;
+
+      liquidStepsText =
+`=== 2. PURE SOLUTE REQUIRED ===
+${pureStepsText}
+
+=== 3. STOCK SOLUTION MASS & VOLUME ===
+Stock Concentration = ${purity}% w/w | Density = ${density.toFixed(4)} g/mL
+1. Required Stock Mass = Pure Mass ÷ (Purity % ÷ 100)
+   = ${pureMass.toFixed(4)} g ÷ ${(purity / 100).toFixed(4)} = ${stockMass.toFixed(4)} g
+2. Required Stock Volume = Stock Mass ÷ Density
+   = ${stockMass.toFixed(4)} g ÷ ${density.toFixed(4)} g/mL = ${requiredStockVol.toFixed(3)} mL (≈ ${requiredStockVol.toFixed(2)} mL)`;
+    }
+
+    heroBadge.textContent = "REQUIRED STOCK VOLUME TO MEASURE";
+    heroResult.textContent = `${requiredStockVol.toFixed(2)} mL`;
+    heroAction.textContent = `Measure exactly ${requiredStockVol.toFixed(2)} mL of stock ${name}`;
+
+    const mwInfo = !isNaN(mw) && mw > 0 ? `Molar Mass = ${mw.toFixed(3)} g/mol | ` : "";
+    const nInfo = !isNaN(nFactor) && nFactor > 0 ? `n-factor = ${nFactor} | ` : "";
+    const eqInfo = !isNaN(eqW) && eqW > 0 ? `Eq. Weight = ${eqW.toFixed(4)} g/eq\n` : "\n";
+
+    breakdownDisplay.textContent =
+`=== 1. TARGET REQUIREMENT ===
+Chemical: ${name} (Liquid Stock)
+${mwInfo}${nInfo}${eqInfo}Target = ${tConc} ${tUnit} in ${volInML.toFixed(1)} mL (${volInLiters.toFixed(4)} L)
+
+${liquidStepsText}`;
+
+    const isAcid = /H2SO4|HCl|HNO3|Sulfuric|Hydrochloric|Nitric|Acetic|CH3COOH/i.test(name);
+    if (isAcid) {
+      safetyAlert.style.display = "flex";
+    }
+
+    renderSOP(name, true, requiredStockVol, "mL", volInML, isAcid);
+  }
+
+  // Render SOP Steps
+  function renderSOP(name, isLiquid, amt, unit, volML, isAcid) {
+    sopList.innerHTML = "";
+    const halfWater = Math.max(20, Math.round(volML * 0.5));
+    const steps = [];
+
+    steps.push(`Obtain a clean <strong>${volML.toFixed(0)} mL volumetric flask</strong>.`);
+    steps.push(`Add approximately <strong>${halfWater} mL of distilled water</strong> to the flask first.`);
+
+    if (isLiquid) {
+      if (isAcid) {
+        steps.push(`Accurately measure <strong>${amt.toFixed(2)} ${unit}</strong> of concentrated ${name} using a calibrated pipette or burette.`);
+        steps.push(`<strong>Slowly add the ${amt.toFixed(2)} ${unit} of acid into the water along the inner wall</strong> while swirling gently. Allow any heat generated to cool down to room temperature.`);
+      } else {
+        steps.push(`Pipette exactly <strong>${amt.toFixed(2)} ${unit}</strong> of stock ${name} into the volumetric flask and swirl gently.`);
+      }
+    } else {
+      steps.push(`Accurately weigh <strong>${amt.toFixed(4)} ${unit}</strong> of ${name} on an analytical balance using a clean weighing boat.`);
+      steps.push(`Transfer the reagent quantitatively into the flask (or dissolve first in a beaker with a portion of distilled water) and swirl until completely dissolved.`);
+    }
+
+    steps.push(`Add distilled water to bring the level near the calibration mark.`);
+    steps.push(`Using a dropper/pipette, add water dropwise until the <strong>meniscus rests exactly on the ${volML.toFixed(0)} mL line</strong>.`);
+    steps.push(`Stopper the flask securely and invert 8–10 times to ensure homogeneous mixing. Label the flask with reagent name, target concentration, and preparation date.`);
+
+    steps.forEach(text => {
+      const li = document.createElement("li");
+      li.innerHTML = text;
+      sopList.appendChild(li);
+    });
+  }
+
+  function displayError(msg) {
+    errorAlert.textContent = msg;
+    errorAlert.style.display = "flex";
+    heroResult.textContent = "--";
+    heroAction.textContent = "Please correct the highlighted inputs";
+    breakdownDisplay.textContent = `Calculation paused: ${msg}`;
+    sopList.innerHTML = "<li>Awaiting valid input values...</li>";
+  }
+
+  // Initialize on script execution: starts completely blank in Custom Mode
+  populateDropdown();
+  setCustomBlank();
+</script>
+
+<div class="developer-card">
+    <span>A PROJECT BY</span>
+    <h2>B.PHARM STUDENT  [RC-52]</h2>
+<h3>RUDRAJIT</h3>
+<br>
+    <p>© 2026 All Rights Reserved</p>
+</div>
+
+<style>
+.developer-card {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+}
+
+.developer-card span {
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.developer-card h2 {
+    margin: 5px 0;
+    font-size: 26px;
+    letter-spacing: 2px;
+}
+
+.developer-card p {
+    font-size: 12px;
+    opacity: 0.5;
+}
+</style>
+
+</body>
+</html>
