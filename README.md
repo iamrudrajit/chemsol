@@ -14,5 +14,5 @@ So it helps and guides a student to make solutions of different concentrations.
 <br><br>
 ## Preview-
 <p align="center">
-<img src="chemsSol.png">
+<img src="chemsol.png">
 </p>
