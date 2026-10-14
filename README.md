@@ -8,3 +8,7 @@
 <br>
 
 So it helps and guides a student to make solutions of different concentrations.
+
+## 🔗🔗 LIVE DEMO
+<BR> CHEMSOL-  *https://iamrudrajit.github.io/chemsol/*
+
