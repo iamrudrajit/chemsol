@@ -10,7 +10,7 @@
 So it helps and guides a student to make solutions of different concentrations.
 
 ## 🔗🔗 LIVE DEMO
-<BR> CHEMSOL-   
+<BR> CHEMSOL- [Click the link to open] 
 ## *https://iamrudrajit.github.io/chemsol/*
 <br><br>
 ## Preview-
